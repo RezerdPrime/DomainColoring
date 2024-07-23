@@ -58,24 +58,32 @@ class Complex {
         return this.sinh(z).div(this.cosh(z));
     }
 
+    static ln(z){
+        return new Complex(Math.log(z.mod), z.arg);
+    }
+
 
     static f(z) {
-        return this.sin(z);
+        return this.exp(this.ln(z).mul(this.ln(z))); //new Complex(0, 1)
     }
 }
 
 
 // Давайте рисавать =================================================================================================== //
 
+let resW = 16*60;
+let resH = 9*60;
+
 let scale = 20;
 let xOffset = 0;
 let yOffset = 0;
-let gridIsOn = 1;
-let axesIsOn = 1;
 
-function setup() {
-  createCanvas(900, 500);
-}
+let gridIsOn = false;
+let axesIsOn = false;
+let factorsIsOn = true;
+
+let rebuild = true;
+
 
 function scx(num) {
     return Math.round(width/2 + scale*num + xOffset);
@@ -85,34 +93,58 @@ function scy(num) {
     return Math.round(height/2 - scale*num + yOffset);
 }
 
-function mouseDragged() {
-    xOffset += mouseX - pmouseX;
-    yOffset += mouseY - pmouseY;
-}
+function reset(event){
 
-function mouseWheel(event) {
-    let delta = event.delta;
-    if (delta < 0) {
-    scale *= 1.1;
-    } else {
-    scale *= 0.9;
-    }
-}
+    event.preventDefault();
 
-function gridOnOff() {
-    gridIsOn = (gridIsOn + 1)%2;
-}
-
-function axesOnOff() {
-    axesIsOn = (axesIsOn + 1)%2;
-}
-
-function reset(){
+    resW = 16*60;
+    resH = 9*60;
     scale = 20;
     xOffset = 0;
     yOffset = 0;
-    gridIsOn = 1;
-    axesIsOn = 1;
+    gridIsOn = false;
+    axesIsOn = false;
+    factorsIsOn = true;
+
+    rebuild = true;
+}
+
+function submitshit(event) {
+
+    event.preventDefault();
+
+    let h = parseInt(document.getElementById('h').value);
+    let w = parseInt(document.getElementById('w').value);
+
+    let x = parseInt(document.getElementById('x').value);
+    let y = parseInt(document.getElementById('y').value);
+
+    let s = parseInt(document.getElementById('s').value);
+    
+    let grid = document.getElementById("grid").checked;
+    let axes = document.getElementById("axes").checked;
+    let factor = document.getElementById("factor").checked;
+
+    if (!isNaN(w) && !isNaN(h)) {
+        if (h > 0 && w > 0){
+            resW = w;
+            resH = h;
+        }
+    }
+    if (!isNaN(x) && !isNaN(y)) {
+        xOffset = x;
+        yOffset = y;
+    }
+
+    if (!isNaN(s)) {
+        scale = s;
+    }
+
+    gridIsOn = grid;
+    axesIsOn = axes;
+    factorsIsOn = factor;
+
+    rebuild = true;
 }
 
 function GridandAxes() {
@@ -144,16 +176,6 @@ function Border(){
     line(0,height,width,height);
     strokeWeight(1);
     stroke(150);
-}
-
-function setpoint(w, h=0, s=1, v=1){
-    push();
-    colorMode(HSB, 360, 1, 1);
-    fill(h, s, v);
-    strokeWeight(2);
-    stroke(0);
-    circle(scx(w.re), scy(w.im), 10);
-    pop();
 }
 
 function ComplexMap(a, h=0.05){
@@ -189,12 +211,46 @@ function ComplexMap(a, h=0.05){
     }
 }
 
+function DomainColoring(){
+
+    for (let i=0; i<width; i++){
+        for (let j=0; j<height; j++){
+            
+            let zx = (i - xOffset - width/2) / scale;
+            let zy = (height/2 - j + yOffset) / scale;
+
+            let z = Complex.f(new Complex(zx, zy));
+            let h = 180 / Math.PI * z.arg + ((z.arg < 0) ? 360 : 0);
+            h = 360 * (h / 360 - Math.floor(h / 360));
+
+            let s = 1;
+            let v = 1;
+
+            if (factorsIsOn) {
+                s = 1 - Math.tanh(z.mod / 3);
+                v = Math.tanh(z.mod);
+            }
+
+            stroke(h, s, v);
+            point(i, j);
+        }
+    };
+}
+
 function draw() {
-    background(255);
 
-    GridandAxes();
-    ComplexMap(2);
-    setpoint(new Complex(1,1,true), 111,1,1);
+    if (rebuild) {
+        createCanvas(resW, resH);
+        background(255);
 
-    Border()
+        push();
+        colorMode(HSB, 360, 1, 1);
+        DomainColoring();
+        pop();
+
+        GridandAxes();
+        Border();
+
+        rebuild = false;
+    }
 }
