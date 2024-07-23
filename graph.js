@@ -178,7 +178,7 @@ function Border(){
     stroke(150);
 }
 
-function ComplexMap(a, h=0.05){
+function ComplexMap(a, h=0.05){ //useless
     
     for (let j=-a; j<a+1; j++) {
 
