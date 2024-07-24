@@ -64,7 +64,7 @@ class Complex {
 
 
     static f(z) {
-        return this.exp(this.ln(z).mul(this.ln(z))); //new Complex(0, 1)
+        return this.sin(this.ln(z)); //new Complex(0, 1)
     }
 }
 
@@ -132,8 +132,8 @@ function submitshit(event) {
         }
     }
     if (!isNaN(x) && !isNaN(y)) {
-        xOffset = x;
-        yOffset = y;
+        xOffset = x * scale;
+        yOffset = y * scale;
     }
 
     if (!isNaN(s)) {
@@ -178,7 +178,7 @@ function Border(){
     stroke(150);
 }
 
-function ComplexMap(a, h=0.05){ //useless
+function ComplexMap(a, h=0.05){
     
     for (let j=-a; j<a+1; j++) {
 
@@ -253,4 +253,9 @@ function draw() {
 
         rebuild = false;
     }
+
+    document.getElementById("hui1").innerText = resW.toString() + " " + resH.toString();
+    document.getElementById("hui2").innerText = xOffset.toString() + " " + yOffset.toString();
+    document.getElementById("hui3").innerText = scale;
+    document.getElementById("hui4").innerText = gridIsOn.toString() + " " + axesIsOn.toString() + " " + factorsIsOn.toString();
 }
