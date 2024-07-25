@@ -12,55 +12,73 @@
                margin-left: 2px; 
                margin-right: 2px;
           }
+          body{
+               margin: 0;
+               display: flex;
+               justify-content: center;
+          }
+          #gen, main{
+               margin-top: 100px;
+          }
         </style>
-   </head>
+  </head>
 
    <body>
         <script src="graph.js"></script>
         <main></main>
-        
-        <div style="display: inline-block">
-          <form style="margin: 10px;">
-               <div style="display: flex">
-                    <input type="text" id="w" placeholder="width" style="width: 75px;">
-                    <input type="text" id="h" placeholder="height" style="width: 75px;">
-               </div>
-     
-               <div style="display: flex">
-                    <input type="text" id="x" placeholder="xOffset" style="width: 75px;">
-                    <input type="text" id="y" placeholder="yOffset" style="width: 75px;">
-               </div>
-     
-               <div style="display: flex">
-                    <input type="text" id="s" placeholder="scale" style="width: 75px;">
-               </div>
-     
-               <div style="display: flex">
-                    <label for="grid">gridIsOn:</label>
-                    <input type="checkbox" id="grid">
-               </div>
-     
-               <div style="display: flex">
-                    <label for="axes">axesIsOn:</label>
-                    <input type="checkbox" id="axes">
-               </div>
-     
-               <div style="display: flex">
-                    <label for="factor">factorIsOn:</label>
-                    <input type="checkbox" id="factor" checked>
-               </div>
-     
-               <button onclick="submitshit(event)">submit</button>
-               <button onclick="reset(event)">reset</button>
-             </form>
-        </div>
 
-        <div style="display: inline-block">
-          <div id="hui1"></div>
-          <div id="hui2"></div>
-          <div id="hui3"></div>
-          <div id="hui4"></div>
-        </div>
+        <div id="gen" style="display: block">
+          <div style="display: inline-block">
+               <form style="margin: 10px;">
+
+                    <div style="display: flex">
+                         <input type="textfield" id="f" placeholder="your func (in process)">
+                    </div>
+
+                    <div style="display: flex">
+                         <input type="text" id="w" placeholder="width" style="width: 75px;">
+                         <input type="text" id="h" placeholder="height" style="width: 75px;">
+                    </div>
+          
+                    <div style="display: flex">
+                         <input type="text" id="x" placeholder="xOffset" style="width: 75px;">
+                         <input type="text" id="y" placeholder="yOffset" style="width: 75px;">
+                    </div>
+          
+                    <div style="display: flex">
+                         <input type="text" id="s" placeholder="scale" style="width: 75px;">
+                    </div>
+          
+                    <div style="display: flex">
+                         <label for="grid">gridIsOn:</label>
+                         <input type="checkbox" id="grid">
+                    </div>
+          
+                    <div style="display: flex">
+                         <label for="axes">axesIsOn:</label>
+                         <input type="checkbox" id="axes">
+                    </div>
+          
+                    <div style="display: flex">
+                         <label for="factor">factorIsOn:</label>
+                         <input type="checkbox" id="factor" checked>
+                    </div>
+          
+                    <button onclick="submitshita(event)">submit</button>
+                    <button onclick="reset(event)">reset</button>
+               </form>
+          </div>
+
+          <div style="display: inline-block">
+               <div id="hui1"></div>
+               <div id="hui2"></div>
+               <div id="hui3"></div>
+               <div id="hui4"></div>
+               <div id="hui5"></div>
+          </div>
+
+          <p id="waitText" style="display: none; margin-left: 50px;">Wait please</p>
+        </div> 
 
    </body>
 </html>
