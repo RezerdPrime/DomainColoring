@@ -22,12 +22,17 @@ class Complex {
     conj(){ return new Complex(this.re, -this.im); }
     inv(){ return new Complex(1 / this.mod, -this.arg, true); }
 
-    mul(w){ return new Complex(this.mod * w.mod, this.arg + w.arg, true); }
-    div(w){ return new Complex(this.mod / w.mod, this.arg - w.arg, true); }
-
-
-    static pow(z, n) {
-        return new Complex(Math.pow(z.mod, n), n*z.arg, true);
+    mul(w){
+        if (typeof(w) === "number"){
+            return new Complex(this.re * w, this.im * w);
+        }
+        return new Complex(this.mod * w.mod, this.arg + w.arg, true); 
+    }
+    div(w){
+        if (typeof(w) === "number"){
+            return new Complex(this.re / w, this.im / w);
+        }
+        return new Complex(this.mod / w.mod, this.arg - w.arg, true); 
     }
 
     static exp(z){
@@ -62,21 +67,46 @@ class Complex {
         return new Complex(Math.log(z.mod), z.arg);
     }
 
+    static pow(z, w) {
+        if (typeof(w) === "number"){
+            return new Complex(Math.pow(z.mod, w), w*z.arg, true);
+        }
+        return this.exp(this.ln(z).mul(w));
+    }
 
-    static f(z) {
-        return this.sin(this.ln(z)); //new Complex(0, 1)
+    static arctan(z){
+        return ( new Complex(0, 0.5) ).mul( this.ln( (new Complex(0, 1).add(z)).div( (new Complex(0, 1).sub(z)) ) ) );
+    }
+
+    static gamma(z){
+        let res = this.exp(z.mul(-0.577215664902)).div(z)
+
+        for (let i=1; i<100; i++) {
+            res = res.mul( this.exp(z.div(i)).div(z.div(i).add(new Complex(1,0))) );
+        }
+
+        return res;
+    }
+
+
+    static f(z) { 
+        //return this.gamma(this.arctan(z));
+        return this.sin(this.ln(z.sub( (new Complex(1,1)).div(z.add(new Complex(0,1))) )));
     }
 }
 
 
 // Давайте рисавать =================================================================================================== //
 
-let resW = 16*60;
-let resH = 9*60;
+let resW = 16*40;
+let resH = 9*40;
 
 let scale = 20;
 let xOffset = 0;
 let yOffset = 0;
+let func = "";
+
+let funclsd = [""]
 
 let gridIsOn = false;
 let axesIsOn = false;
@@ -84,6 +114,7 @@ let factorsIsOn = true;
 
 let rebuild = true;
 
+function setup(){ colorMode(HSB, 360, 1, 1); }
 
 function scx(num) {
     return Math.round(width/2 + scale*num + xOffset);
@@ -92,6 +123,12 @@ function scx(num) {
 function scy(num) {
     return Math.round(height/2 - scale*num + yOffset);
 }
+
+// function parser(input) {
+//     const parsedFunc = input.replace(/([a-z]+)/g, 'Math.$1').replace(/([0-9.]+)/g, '$1');
+//     //const result = eval(parsedFunc);
+//     return parsedFunc;
+// }
 
 function reset(event){
 
@@ -111,8 +148,6 @@ function reset(event){
 
 function submitshit(event) {
 
-    event.preventDefault();
-
     let h = parseInt(document.getElementById('h').value);
     let w = parseInt(document.getElementById('w').value);
 
@@ -120,6 +155,7 @@ function submitshit(event) {
     let y = parseInt(document.getElementById('y').value);
 
     let s = parseInt(document.getElementById('s').value);
+    let f = document.getElementById('f').value;
     
     let grid = document.getElementById("grid").checked;
     let axes = document.getElementById("axes").checked;
@@ -132,7 +168,7 @@ function submitshit(event) {
         }
     }
     if (!isNaN(x) && !isNaN(y)) {
-        xOffset = x * scale;
+        xOffset = -x * scale;
         yOffset = y * scale;
     }
 
@@ -143,15 +179,24 @@ function submitshit(event) {
     gridIsOn = grid;
     axesIsOn = axes;
     factorsIsOn = factor;
+    func = '"' + f + '"';
 
     rebuild = true;
 }
 
+function submitshita(event) {
+    event.preventDefault();
+    document.getElementById('waitText').style.display = 'block';
+
+    setTimeout(function() {
+        submitshit(event);
+      }, 100);
+}
+
 function GridandAxes() {
 
-    stroke(150);
-
     if (gridIsOn) {
+        stroke(0,0,0.75);
         for (var i = scx(0); i>0; i -= scale) { line(i, -height, i, height); }
         for (var i = scx(0); i<width; i += scale) { line(i, -height, i, height); }
 
@@ -161,9 +206,9 @@ function GridandAxes() {
 
     if (axesIsOn) {
         stroke(0);
+        strokeWeight(2);
         line(-width, scy(0), width, scy(0));
         line(scx(0), -height, scx(0), height);
-        stroke(150);
     }
 }
 
@@ -174,8 +219,6 @@ function Border(){
     line(0,0,width,0);
     line(width,0,width,height);
     line(0,height,width,height);
-    strokeWeight(1);
-    stroke(150);
 }
 
 function ComplexMap(a, h=0.05){
@@ -232,30 +275,31 @@ function DomainColoring(){
             }
 
             stroke(h, s, v);
+            strokeWeight(2);
             point(i, j);
         }
     };
 }
 
-function draw() {
+function SetPoint(z) { circle(scx(z.re), scy(z.im), 10); }
 
+function draw() {
+    
     if (rebuild) {
         createCanvas(resW, resH);
-        background(255);
 
-        push();
-        colorMode(HSB, 360, 1, 1);
         DomainColoring();
-        pop();
 
         GridandAxes();
         Border();
 
         rebuild = false;
+        document.getElementById('waitText').style.display = 'none';
     }
 
     document.getElementById("hui1").innerText = resW.toString() + " " + resH.toString();
     document.getElementById("hui2").innerText = xOffset.toString() + " " + yOffset.toString();
     document.getElementById("hui3").innerText = scale;
     document.getElementById("hui4").innerText = gridIsOn.toString() + " " + axesIsOn.toString() + " " + factorsIsOn.toString();
+    document.getElementById("hui5").innerText = func;//eval("Complex.sin(new Complex(1,1))").mod;
 }
