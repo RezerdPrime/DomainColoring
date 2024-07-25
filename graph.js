@@ -151,10 +151,10 @@ function submitshit(event) {
     let h = parseInt(document.getElementById('h').value);
     let w = parseInt(document.getElementById('w').value);
 
-    let x = parseInt(document.getElementById('x').value);
-    let y = parseInt(document.getElementById('y').value);
+    let x = parseFloat(document.getElementById('x').value);
+    let y = parseFloat(document.getElementById('y').value);
 
-    let s = parseInt(document.getElementById('s').value);
+    let s = parseFloat(document.getElementById('s').value);
     let f = document.getElementById('f').value;
     
     let grid = document.getElementById("grid").checked;
