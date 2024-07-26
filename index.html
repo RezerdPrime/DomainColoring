@@ -1,33 +1,28 @@
 <!DOCTYPE html>
 <html>
-   <head>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-          input{
-               margin:2px;
-          }
-          label{
-               color:gray; 
-               margin-left: 2px; 
-               margin-right: 2px;
-          }
-          body{
-               margin: 0;
-               display: flex;
-               justify-content: center;
-          }
-          #gen, main{
-               margin-top: 100px;
-          }
-        </style>
-  </head>
+<head>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <style>
+     input{
+          margin:2px;
+     }
+     label{
+          color:gray; 
+          margin-left: 2px; 
+          margin-right: 2px;
+     }
+     body{
+          text-align: center;
+     }
+     </style>
+</head>
 
-   <body>
-        <script src="graph.js"></script>
-        <main></main>
+<body>
+     <script src="graph.js"></script>
+     <div class="gen"><main></main></div>
 
-        <div id="gen" style="display: block">
+     <div class="gen">
           <div style="display: inline-block">
                <form style="margin: 10px;">
 
@@ -63,9 +58,11 @@
                          <label for="factor">factorIsOn:</label>
                          <input type="checkbox" id="factor" checked>
                     </div>
-          
-                    <button onclick="submitshita(event)">submit</button>
-                    <button onclick="reset(event)">reset</button>
+                    
+                    <div style="display: flex" style="margin-top:5px">
+                         <button onclick="submitshita(event)">submit</button>
+                         <button onclick="reset(event)" style="margin-left:5px">reset</button>
+                    </div>
                </form>
           </div>
 
@@ -78,7 +75,7 @@
           </div>
 
           <p id="waitText" style="display: none; margin-left: 50px;">Wait please</p>
-        </div> 
+     </div> 
 
-   </body>
+</body>
 </html>
