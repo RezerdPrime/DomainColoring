@@ -89,8 +89,7 @@ class Complex {
     }
 
 
-    static f(z) { 
-        //return this.gamma(this.arctan(z));
+    static f(z) {
         return this.sin(this.ln(z.sub( (new Complex(1,1)).div(z.add(new Complex(0,1))) )));
     }
 }
@@ -98,15 +97,17 @@ class Complex {
 
 // Давайте рисавать =================================================================================================== //
 
-let resW = 16*40;
-let resH = 9*40;
+let resW = 960;//16*40;
+let resH = 540;//9*40;
 
-let scale = 20;
+let scale = 60;
 let xOffset = 0;
 let yOffset = 0;
 let func = "";
 
-let funclsd = [""]
+let oplist = ["+", "-", "*", "/", "^", "(", ")"];
+let numlist = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "i"]
+let funclist = ["conj", "exp", "sin", "cos", "sinh", "cosh", "ln", "tan", "tanh", "arctan", "gamma", "z"]
 
 let gridIsOn = false;
 let axesIsOn = false;
@@ -128,7 +129,24 @@ function scy(num) {
 //     const parsedFunc = input.replace(/([a-z]+)/g, 'Math.$1').replace(/([0-9.]+)/g, '$1');
 //     //const result = eval(parsedFunc);
 //     return parsedFunc;
-// }
+// } sin(z+1.2)-ln(cos(1-2*z))
+
+function parser(input){ // hui
+    let str = input;
+    let str2 = input;
+
+    for (let i=0; i<oplist.length; i++){
+        str = str.split(oplist[i]).join(" " + oplist[i] + " ");
+        str2 = str2.split(oplist[i]).join(" ");
+    }
+
+    for (let i=0; i<numlist.length; i++){ str2 = str2.split(numlist[i]).join(" ");}
+    for (let i=0; i<funclist.length; i++){ str2 = str2.split(funclist[i]).join(" ");}
+
+    if (str2.split(" ").join("") !== "") { return "Input error"; }
+
+    return "hui";
+}
 
 function reset(event){
 
@@ -179,7 +197,7 @@ function submitshit(event) {
     gridIsOn = grid;
     axesIsOn = axes;
     factorsIsOn = factor;
-    func = '"' + f + '"';
+    func = '"' + parser(f) + '"'; // hui
 
     rebuild = true;
 }
@@ -254,31 +272,65 @@ function ComplexMap(a, h=0.05){
     }
 }
 
+function hsvToRgb(h, s, v) {
+    let r, g, b;
+    let i, f, p, q, t;
+    if (s === 0) {
+      r = g = b = v;
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
+    h /= 60;
+    i = Math.floor(h);
+    f = h - i;
+    p = v * (1 - s);
+    q = v * (1 - s * f);
+    t = v * (1 - s * (1 - f));
+    switch (i) {
+      case 0: r = v; g = t; b = p; break;
+      case 1: r = q; g = v; b = p; break;
+      case 2: r = p; g = v; b = t; break;
+      case 3: r = p; g = q; b = v; break;
+      case 4: r = t; g = p; b = v; break;
+      default: r = v; g = p; b = q; break;
+    }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+  
+
 function DomainColoring(){
+
+    let zx, zy, z, h, s, v, col;
+    loadPixels();
 
     for (let i=0; i<width; i++){
         for (let j=0; j<height; j++){
             
-            let zx = (i - xOffset - width/2) / scale;
-            let zy = (height/2 - j + yOffset) / scale;
+            zx = (i - xOffset - width/2) / scale;
+            zy = (height/2 - j + yOffset) / scale;
 
-            let z = Complex.f(new Complex(zx, zy));
-            let h = 180 / Math.PI * z.arg + ((z.arg < 0) ? 360 : 0);
+            z = Complex.f(new Complex(zx, zy));
+            h = 180 / Math.PI * z.arg + ((z.arg < 0) ? 360 : 0);
             h = 360 * (h / 360 - Math.floor(h / 360));
 
-            let s = 1;
-            let v = 1;
+            s = 1; v = 1;
 
             if (factorsIsOn) {
                 s = 1 - Math.tanh(z.mod / 3);
                 v = Math.tanh(z.mod);
             }
 
-            stroke(h, s, v);
-            strokeWeight(2);
-            point(i, j);
+            col = hsvToRgb(h, s, v);
+
+            pixels[4*width*j + 4*i] = col[0];
+            pixels[4*width*j + 4*i + 1] = col[1];
+            pixels[4*width*j + 4*i + 2] = col[2];
+            pixels[4*width*j + 4*i + 3] = 255;
+            // stroke(h, s, v);
+            // strokeWeight(2);
+            // point(i, j);
         }
     };
+    updatePixels();
 }
 
 function SetPoint(z) { circle(scx(z.re), scy(z.im), 10); }
