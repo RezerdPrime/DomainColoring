@@ -79,11 +79,15 @@ class Complex {
     }
 
     static gamma(z){
-        let res = this.exp(z.mul(-0.577215664902)).div(z)
+        let res = this.exp(z.mul(-0.577215664902)).div(z);
 
         for (let i=1; i<100; i++) {
-            res = res.mul( this.exp(z.div(i)).div(z.div(i).add(new Complex(1,0))) );
+
+            //res = res.mul( this.exp( z.div(i) ).div(z.div(i).add(new Complex(1,0))) );
+            res = res.mul( this.exp(new Complex(z.re / i, z.im / i)).div(new Complex(z.re / i + 1, z.im / i) ) );
         }
+
+        // new Complex(z.re / i + 1, z.im / i)
 
         return res;
     }
@@ -91,6 +95,8 @@ class Complex {
 
     static f(z) {
         return this.sin(this.ln(z.sub( (new Complex(1,1)).div(z.add(new Complex(0,1))) )));
+        //return ( ( z.mul(new Complex(0,-1)).add(new Complex(1,0)) ).mul(Math.E) ).add( (new Complex(0,1)).mul(z).mul( this.exp(this.exp( (new Complex(0,1)).div(z) ) ) ) );
+        //return this.exp(z);
     }
 }
 
@@ -115,7 +121,11 @@ let factorsIsOn = true;
 
 let rebuild = true;
 
-function setup(){ colorMode(HSB, 360, 1, 1); }
+function setup(){ 
+    createCanvas(resW, resH);
+    colorMode(HSB, 360, 1, 1);
+    frameRate(60); 
+}
 
 function scx(num) {
     return Math.round(width/2 + scale*num + xOffset);
@@ -239,39 +249,6 @@ function Border(){
     line(0,height,width,height);
 }
 
-function ComplexMap(a, h=0.05){
-    
-    for (let j=-a; j<a+1; j++) {
-
-        let z_prev = Complex.f(new Complex(-a, j));
-        let z_cur = Complex.f(new Complex(-a+h, j));
-
-        let w_prev = Complex.f(new Complex(j, -a));
-        let w_cur = Complex.f(new Complex(j, -a+h));
-
-        for (let i=-a; i<a+h; i+=h){
-
-            push();
-            stroke("red");
-            strokeWeight(2);
-            line(scx(z_prev.re), scy(z_prev.im), scx(z_cur.re), scy(z_cur.im));
-            pop();
-
-            push();
-            stroke("blue");
-            strokeWeight(2);
-            line(scx(w_prev.re), scy(w_prev.im), scx(w_cur.re), scy(w_cur.im));
-            pop();
-
-            z_prev = z_cur;
-            z_cur = Complex.f(new Complex(i+h, j));
-
-            w_prev = w_cur;
-            w_cur = Complex.f(new Complex(j, i+h));
-        }
-    }
-}
-
 function hsvToRgb(h, s, v) {
     let r, g, b;
     let i, f, p, q, t;
@@ -335,11 +312,24 @@ function DomainColoring(){
 
 function SetPoint(z) { circle(scx(z.re), scy(z.im), 10); }
 
-function draw() {
-    
-    if (rebuild) {
-        createCanvas(resW, resH);
+function mouseDragged() {
+    xOffset += mouseX - pmouseX;
+    yOffset += mouseY - pmouseY;
+    rebuild = true;
+}
 
+function mouseWheel(event) {
+    let delta = event.delta;
+    if (delta < 0) {
+    scale *= 1.1;
+    } else {
+    scale *= 0.9;
+    }
+    rebuild = true;
+}
+
+function draw() {    
+    if (rebuild) {
         DomainColoring();
 
         GridandAxes();
@@ -353,5 +343,5 @@ function draw() {
     document.getElementById("hui2").innerText = xOffset.toString() + " " + yOffset.toString();
     document.getElementById("hui3").innerText = scale;
     document.getElementById("hui4").innerText = gridIsOn.toString() + " " + axesIsOn.toString() + " " + factorsIsOn.toString();
-    document.getElementById("hui5").innerText = func;//eval("Complex.sin(new Complex(1,1))").mod;
+    document.getElementById("hui5").innerText = "so laggy huh?";//func;//eval("Complex.sin(new Complex(1,1))").mod;
 }
