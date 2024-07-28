@@ -302,9 +302,6 @@ function DomainColoring(){
             pixels[4*width*j + 4*i + 1] = col[1];
             pixels[4*width*j + 4*i + 2] = col[2];
             pixels[4*width*j + 4*i + 3] = 255;
-            // stroke(h, s, v);
-            // strokeWeight(2);
-            // point(i, j);
         }
     };
     updatePixels();
@@ -330,6 +327,7 @@ function mouseWheel(event) {
 
 function draw() {    
     if (rebuild) {
+        createCanvas(resW, resH);
         DomainColoring();
 
         GridandAxes();
